@@ -1,4 +1,4 @@
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 import pandas as pd
 
 from Strategizer.Action import Action
@@ -20,7 +20,7 @@ class Habit:
      -We measure the magnitude of autonomy
 
      Habit classification:
-     -Frequency (expressed as number of times weekly)
+     -Frequency (expressed as number of times daily)
 
     """
 
@@ -36,11 +36,15 @@ class Habit:
 
         self.actions = pd.DataFrame(columns=['date', 'autonomy_rating', 'cue_strength_rating'])
 
-    def log_action(self, date=None, autonomy_rating=None, cue_strength_rating=None):
-        if date is None:
-            date = date.today()
+    def log_action(self, date=date.today(), autonomy_rating=None, cue_strength_rating=None):
         self.actions.append(Action(self.name, date, autonomy_rating, cue_strength_rating))
 
     def habit_strength_score(self, period=90):
-        mask = (self.actions['date'] > (date.today() - timedelta(days=period)) & (self.actions['date'] <= date.today()))
-        recent_actions = self.actions.loc[mask]
+        start_date = date.today() - timedelta(days=90)
+        end_date = date.today()
+        recent_actions = self.actions['date'].between(start_date, end_date)
+
+        average_autonomy = recent_actions.mean(axis='autonomy_rating')
+        score = recent_actions.count() / self.frequency*period
+
+        return score
