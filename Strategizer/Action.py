@@ -1,3 +1,6 @@
+import datetime
+
+
 class Action:
     """
     Represents a possible move towards completion of a goal
@@ -9,3 +12,12 @@ class Action:
 
         self.autonomy_rating = autonomy_rating
         self.cue_strength_rating = cue_strength_rating
+
+    def as_dict(self):
+        return {'date': self.date,
+                'autonomy_rating': self.autonomy_rating,
+                'cue_strength_rating': self.cue_strength_rating}
+
+    @property
+    def is_recent(self):
+        return True if ((datetime.date.today() - self.date).days <= 90) else False
